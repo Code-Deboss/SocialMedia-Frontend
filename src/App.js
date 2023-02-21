@@ -1,16 +1,26 @@
-import React from 'react'
-// import './index.css'
-import { Routes, Route } from "react-router-dom";
-import Home from "./container/Home";
-import Login from "./components/Login";
+import React, { useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Login } from './components';
+import Home from './container/Home';
+import { getUserDataFromToken } from './utilities';
 
-function App() {
+const App = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const userInfo = getUserDataFromToken();
+    if (!userInfo) {
+      localStorage.clear();
+      navigate('/login');
+    }
+  }, [navigate]);
+
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route exact path="*" element={<Home />} />
+      <Route path='login' element={<Login />} />
+      <Route path='/*' element={<Home />} />
     </Routes>
   );
-}
+};
 
 export default App;

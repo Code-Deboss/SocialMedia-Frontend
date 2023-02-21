@@ -45,33 +45,67 @@ export const categories = [
     image: 'https://i.pinimg.com/236x/1b/c8/30/1bc83077e363db1a394bf6a64b071e9f.jpg',
   },
   {
-    name: 'others',
+    name: 'other',
     image: 'https://i.pinimg.com/236x/2e/63/c8/2e63c82dfd49aca8dccf9de3f57e8588.jpg',
   },
 ];
 
-export const feedQuery = `*[_type == "pin"] | order(_createdAt desc) {
-  image{
-    asset->{
-      url
-    }
-  },
+export const userQuery = (userId) => {
+  const query = `*[_type == "user" && _id == '${userId}']`;
+  return query;
+};
+
+export const searchQuery = (searchTerm) => {
+  const query = `*[_type == "pin" && title match '${searchTerm}*' || category match '${searchTerm}*' || about match '${searchTerm}*']{
+    image {
+      asset -> {
+        url
+      }
+    },
+    _id,
+    destination,
+    postedBy -> {
       _id,
-      destination,
-      postedBy->{
+      userName,
+      image
+    },
+    save[] {
+      _key,
+      postedBy -> {
         _id,
         userName,
         image
       },
-      save[]{
-        _key,
-        postedBy->{
-          _id,
-          userName,
-          image
-        },
+    },
+  }`;
+  return query;
+};
+
+export const feedQuery = () => {
+  const query = `*[_type == 'pin'] | order(_createdAt desc) {
+    image {
+      asset -> {
+        url
+      }
+    },
+    _id,
+    destination,
+    postedBy -> {
+      _id,
+      userName,
+      image
+    },
+    save[] {
+      _key,
+      postedBy -> {
+        _id,
+        userName,
+        image
       },
-    } `;
+    },
+  }`;
+  return query;
+};
 
 export const pinDetailQuery = (pinId) => {
   const query = `*[_type == "pin" && _id == '${pinId}']{
@@ -133,37 +167,6 @@ export const pinDetailMorePinQuery = (pin) => {
       },
     },
   }`;
-  return query;
-};
-
-export const searchQuery = (searchTerm) => {
-  const query = `*[_type == "pin" && title match '${searchTerm}*' || category match '${searchTerm}*' || about match '${searchTerm}*']{
-        image{
-          asset->{
-            url
-          }
-        },
-            _id,
-            destination,
-            postedBy->{
-              _id,
-              userName,
-              image
-            },
-            save[]{
-              _key,
-              postedBy->{
-                _id,
-                userName,
-                image
-              },
-            },
-          }`;
-  return query;
-};
-
-export const userQuery = (userId) => {
-  const query = `*[_type == "user" && _id == '${userId}']`;
   return query;
 };
 
